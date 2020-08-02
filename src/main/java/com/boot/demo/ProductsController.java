@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+
 @RestController
 public class ProductsController {
 	
@@ -27,6 +29,7 @@ public class ProductsController {
 	@Autowired
 	private RestTemplate restTemplate;
 
+	@HystrixCommand(fallbackMethod = "getProductsFallbackImpl")
 	@RequestMapping("/getProducts")
 	public List<ProductData> getProducts()
 	{
@@ -45,6 +48,27 @@ public class ProductsController {
 		LOG.info("resp from StockAndPrice MS >> "+resp.getBody().getOfflineStock());
 		
 		product1.setStockAndPrice(resp.getBody());
+		
+		List<ProductData> dataList = new ArrayList<>();
+		
+		dataList.add(product1);
+		
+		return dataList;
+	}
+	
+	public List<ProductData> getProductsFallbackImpl()
+	{
+		ProductData product1 = new ProductData();
+		product1.setCode("A00001");
+		product1.setName("Pureit Ultima Mineral RO + UV");
+		product1.setDesc("Pureit brings to you a water purifier that looks stunning and comes with an advanced RO + UV purification technology that not only gives you pure water but also adds minerals to enhance the taste of water.");
+		
+		StockAndPriceData stockAndPriceData = new StockAndPriceData();
+		stockAndPriceData.setOfflineStock(0);
+		stockAndPriceData.setOnlineStock(0);
+		stockAndPriceData.setUnitPrice(0.00);
+		stockAndPriceData.setUom("");
+		product1.setStockAndPrice(stockAndPriceData);
 		
 		List<ProductData> dataList = new ArrayList<>();
 		
