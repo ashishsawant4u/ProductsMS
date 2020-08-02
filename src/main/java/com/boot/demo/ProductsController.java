@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ public class ProductsController {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ProductsController.class);
 	
+	@LoadBalanced
 	@Bean
 	public RestTemplate template() {
 	    return new RestTemplate();
@@ -36,7 +38,7 @@ public class ProductsController {
 		product1.setName("Pureit Ultima Mineral RO + UV");
 		product1.setDesc("Pureit brings to you a water purifier that looks stunning and comes with an advanced RO + UV purification technology that not only gives you pure water but also adds minerals to enhance the taste of water.");
 		
-		String stockAndPriceUrl = "http://localhost:8023/stockandpriceMS/getStockAndPrice";
+		String stockAndPriceUrl = "http://STOCKANDPRICEMS/stockandpriceMS/getStockAndPrice";
 		
 		ResponseEntity<StockAndPriceData> resp = restTemplate.postForEntity(stockAndPriceUrl, product1.getCode(),StockAndPriceData.class);
 		
